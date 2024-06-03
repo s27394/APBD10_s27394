@@ -1,6 +1,7 @@
 using CodeFirstDemo.Contexts;
 using CodeFirstDemo.Exceptions;
 using CodeFirstDemo.Interfaces;
+using CodeFirstDemo.RequestModels;
 using CodeFirstDemo.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,19 @@ app.MapGet("api/accounts/{id:int}", async (int id, IDbService service) =>
     catch (NotFoundException e)
     {
         return Results.NotFound(e.Message);
+    }
+});
+
+app.MapPost("api/products", async (PostProductRequestModel requestModel, IDbService service) =>
+{
+    try
+    {
+        var result = await service.AddProductWithCategories(requestModel);
+        return Results.Created($"product created" , result);
+    }
+    catch (AddProductException e)
+    {
+        return Results.BadRequest(e.Message);
     }
 });
 

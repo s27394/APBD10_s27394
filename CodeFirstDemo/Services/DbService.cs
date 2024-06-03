@@ -1,5 +1,7 @@
 using CodeFirstDemo.Contexts;
+using CodeFirstDemo.Exceptions;
 using CodeFirstDemo.Interfaces;
+using CodeFirstDemo.Models;
 using CodeFirstDemo.RequestModels;
 using CodeFirstDemo.ResponseModels;
 using Microsoft.EntityFrameworkCore;
@@ -37,4 +39,33 @@ public class DbService(DatabaseContext context) : IDbService
         return response;
     }
 
+    public async Task<PostProductResponseModel> AddProductWithCategories(PostProductRequestModel request)
+    {
+        foreach (var productCategory in request.Categories)
+        {
+            var category = await context.Categories.FindAsync(productCategory);
+            if (category == null)
+            {
+                throw new AddProductException($"Category with id {productCategory} does not exist.");
+            }
+        }
+
+        var product = new Product(request);
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
+
+        foreach (var productCategory in request.Categories)
+        {
+            var productCategoryEntity = new ProductCategory
+            {
+                ProductId = product.PK,
+                CategoryId = productCategory
+            };
+            context.ProductsCategories.Add(productCategoryEntity);
+        }
+        await context.SaveChangesAsync();
+
+
+        return new PostProductResponseModel(product);
+    }
 }

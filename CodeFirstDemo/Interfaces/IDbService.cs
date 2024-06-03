@@ -6,6 +6,6 @@ namespace CodeFirstDemo.Interfaces;
 public interface IDbService
 {
     Task<GetAccountResponseModel> GetAccountByIdAsync(int id);
-    // Task<PostProductResponseModel> AddProductWithCategories(PostProductRequestModel request);
+    Task<PostProductResponseModel> AddProductWithCategories(PostProductRequestModel request);
 
 }
